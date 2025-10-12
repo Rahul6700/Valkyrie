@@ -69,5 +69,5 @@ void Connection::close()
 //destructor
 Connection::~Connection()
 {
-
+  close();
 }
