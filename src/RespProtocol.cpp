@@ -9,8 +9,10 @@
 // $3\r\nkey\r\n → second string "key"
 // $5\r\nvalue\r\n → third string "value" (len = 5, so $5)
 
+namespace RespProtocol {
+
 //encode function taking in an str vector as input
-std::string RespProtocol::encode(const std::vector<std::string>& arr)
+std::string encode(const std::vector<std::string>& arr)
 {
   std::string encodedString;
 
@@ -87,3 +89,5 @@ std::string decode(const std::string& reply) {
 
     return ""; // in case of some unknowb type
 }
+
+}; // closing the namespace
