@@ -1,4 +1,6 @@
 #pragma once //ensures the header is included only once per compilation
+#include <string>
+#include <netinet/in.h>
 
 class Connection {
   public:

@@ -1,5 +1,8 @@
 #include "Connection.hpp"
 #include <sys/socket.h>
+#include <unistd.h>
+#include <arpa/inet.h>
+#include <iostream>
 #include <string>
 
 // not importing 'namespace std' since we'll have a naming conflict, we have a user defined 'close' func and a 'close' system call
@@ -14,13 +17,13 @@ Connection::Connection(const std::string& h, int p)
   sockfd = -1;
 }
 
-Connection::connect
+bool Connection::connect()
 {
   //creating socket
   sockfd = socket(AF_INET, SOCK_STREAM, 0); // AF_INET -> IPV4 and SOCK_STREAM -> TCP
   if(sockfd < 0)
   {
-    std::cout << "error creating socket in Connection.connect" << endl;
+    std::cout << "error creating socket in Connection.connect" << std::endl;
     return false;
   }
 
@@ -33,7 +36,7 @@ Connection::connect
   //we currently have out host as a string, like "127.0.01". we need to convert it to binary cuz the system call accepts a binary input
   // we use the inet_pton function to convert IPV4/6 addresses from string to binary -> return 1 on success, 0 if not a valid IP addr str, and -ve if some other error
   if (inet_pton(AF_INET, host.c_str(), &serverAddress.sin_addr) <= 0) {
-    std::cout << "invalid address" << endl;
+    std::cout << "invalid address" << std::endl;
     ::close(sockfd);
     return false;
   }
@@ -52,7 +55,7 @@ Connection::connect
 }
 
 //function closing the connection
-Connection::close()
+void Connection::close()
 {
   //check if socket is open first
   if(sockfd >= 0)
