@@ -74,7 +74,8 @@ Connection::~Connection()
   close();
 }
 
-bool Connection::sendData(const std::string& data) {
+bool Connection::sendData(const std::string& data)
+{
     if (!connected) {
         std::cout << "error: not connected to the server" << std::endl;
         return false;
@@ -93,4 +94,12 @@ bool Connection::sendData(const std::string& data) {
         totalSent += sent;
     }
     return true; //if all the data is sent through successfully
+}
+
+std::string receive()
+{
+  char buffer[1024]; //we'll store the received data in a buffer
+  ssize_t received_data = recv(sockfd,buffer,sizeof(buffer),0); // use the 'recv' sys call to recieve data
+  if(received_data <= 0) return "";
+  else return std::string(buffer, received_data);          
 }
