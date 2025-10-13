@@ -96,7 +96,7 @@ bool Connection::sendData(const std::string& data)
     return true; //if all the data is sent through successfully
 }
 
-std::string receive()
+std::string Connection::receive()
 {
   char buffer[1024]; //we'll store the received data in a buffer
   ssize_t received_data = recv(sockfd,buffer,sizeof(buffer),0); // use the 'recv' sys call to recieve data

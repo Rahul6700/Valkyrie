@@ -3,6 +3,7 @@
 #include <vector>
 #include "Connection.hpp"
 #include "RespProtocol.hpp"
+#include "ValkeyClient.hpp"
 
 int main()
 {
@@ -13,9 +14,12 @@ int main()
   //std::cout << ans << std::endl;
   
   //default port for valkey -> 6379 and 127.0.0.1 cuz server is running locally rn
-  Connection obj("127.0.0.1",6379);
-  if(obj.connect()) std::cout << "connected from main" << std::endl;
-  else std::cout << "error connection from main" << std::endl;
-  obj.close();
-  return 0;
+  // Valkey obj("127.0.0.1",6379);
+  // if(obj.connect()) std::cout << "connected from main" << std::endl;
+  // else std::cout << "error connection from main" << std::endl;
+  // obj.close();
+  // return 0;
+  ValkeyClient client("127.0.0.1",6379);
+  client.connect();
+  client.set("yo","hehe");
 }

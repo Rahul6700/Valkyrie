@@ -18,7 +18,7 @@ void ValkeyClient::close()
 
 std::string ValkeyClient::set(const std::string& key, const std::string& value)
 {
-  if(!connection.connected) return "Error: connection to server not active";
+  if(!connection.isConnected()) return "Error: connection to server not active";
 
   if(key.empty() || value.empty()) return "Error: Key or value cannot be NULL or an empty string";
 
