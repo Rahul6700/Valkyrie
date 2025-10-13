@@ -1,24 +1,29 @@
 #include "ValkeyClient.hpp"
 #include "Connection.hpp"
 
+// 'connection' is the Connection class obj to be used for all the ValkeyClient methods
+
 // use the connect function defined in the Connection class
-ValkeyClient::connect()
+bool ValkeyClient::connect()
 {
-  Connection obj;
-  if(obj.connect()) return true;
-  else return false;
+  return connection.connect();
 }
 
 // usingg the disconnect function used in the Connection class
-ValkeyClient::close()
+void ValkeyClient::close()
 {
-  Connection obj;
-  obj.close();
+  connection.close();
 }
 
-bool ValkeyClient::set(const std::string key, const std::string value)
+bool ValkeyClient::set(const std::string& key, const std::string& value)
 {
-  
+  if(!connection.connected)
+  {
+    std::cout << "connection to server not active" std::endl;
+    return false;
+  }
+
+
 }
 
 
