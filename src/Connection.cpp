@@ -51,6 +51,7 @@ bool Connection::connect()
   }
 
   std::cout << "connection successful to server" << std::endl;
+  connected = true;
   return true;
 }
 
@@ -62,6 +63,7 @@ void Connection::close()
   {
     ::close(sockfd); //this is global system call, not out func
     sockfd = -1;
+    connected = false;
     std::cout << "connection closed" << std::endl;
   }
 }
