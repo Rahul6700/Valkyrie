@@ -16,24 +16,19 @@ void ValkeyClient::close()
   connection.close();
 }
 
-bool ValkeyClient::set(const std::string& key, const std::string& value)
+std::string ValkeyClient::set(const std::string& key, const std::string& value)
 {
-  if(!connection.connected)
-  {
-    std::cout << "connection to server not active" std::endl;
-    return false;
-  }
+  if(!connection.connected) return "Error: connection to server not active";
 
-  if(key.empty() || value.empty())
-  {
-    std::cout << "Key or value cannot be NULL or an empty string" << std::endl;
-    return false;
-  }
+  if(key.empty() || value.empty()) return "Error: Key or value cannot be NULL or an empty string";
 
-  string resp_encoded = RespProtocol::encode({"SET",key,value});
-  if(!connection.sendData(resp_encoded)) return false;
+  std::string resp_encoded = RespProtocol::encode({"SET",key,value});
+  if(!connection.sendData(resp_encoded)) return "Error: coneection to server not active";
 
-  return true;
+  std::string reply = connection.receive();
+  std::string decoded_reply = RespProtocol::decode(reply);
+  
+  return decoded_reply;
 }
 
 
