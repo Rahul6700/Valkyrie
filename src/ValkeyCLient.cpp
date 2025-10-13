@@ -47,4 +47,19 @@ std::string ValkeyClient::del(const std::string& key)
   return decoded_reply;
 }
 
+std::string ValkeyClient::get(const std::string& key)
+{
+  if(!connection.isConnected()) return "Error: connection to server not active";
+  if(key.empty()) return "Error: Key value cannot be an empty string";
+
+  std::string resp_encoded = RespProtocol::encode({"GET",key});
+  if(!connection.sendData(resp_encoded)) return "Error: Connection to server is not active";
+
+  std::string reply = connection.receive();
+  std::string decoded_reply = RespProtocol::decode(reply);
+
+  if(decoded_reply == "") return "(nil)";
+  return decoded_reply;
+}
+
 

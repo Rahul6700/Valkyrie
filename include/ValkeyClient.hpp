@@ -17,7 +17,7 @@ public:
   void close();
 
   //set, get and del functions for interacting with the db
-  std::string get(const std::string key);
+  std::string get(const std::string& key);
   std::string set(const std::string& key, const std::string& value);
   std::string del(const std::string& key);
 
