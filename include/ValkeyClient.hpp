@@ -15,4 +15,7 @@ public:
   std::string get(const std::string key);
   bool set(const std::string key, const std::string value);
   bool del(const std::string key);
+
+private:
+  Connection connection; // a pvt connection ocj to be used for all valkey api activities
 }; 
