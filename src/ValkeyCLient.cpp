@@ -28,6 +28,8 @@ std::string ValkeyClient::set(const std::string& key, const std::string& value)
   std::string reply = connection.receive();
   std::string decoded_reply = RespProtocol::decode(reply);
   
+  if(decoded_reply != "OK") return "Error: " + decoded_reply; // adding the 'Error' tag to any non-OK respone
+  
   return decoded_reply;
 }
 
