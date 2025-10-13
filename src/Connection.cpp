@@ -61,7 +61,7 @@ void Connection::close()
   //check if socket is open first
   if(sockfd >= 0)
   {
-    ::close(sockfd); //this is global system call, not out func
+    ::close(sockfd); //this is global system call, not our func
     sockfd = -1;
     connected = false;
     std::cout << "connection closed" << std::endl;
@@ -72,4 +72,25 @@ void Connection::close()
 Connection::~Connection()
 {
   close();
+}
+
+bool Connection::sendData(const std::string& data) {
+    if (!connected) {
+        std::cout << "error: not connected to the server" << std::endl;
+        return false;
+    }
+    // send all the data
+    size_t totalSent = 0;
+    size_t dataLen = data.size();
+    const char* buffer = data.c_str(); // converting our data into a C styled char array
+
+    while (totalSent < dataLen) { //while loop till all the data is not sent
+        ssize_t sent = send(sockfd, buffer + totalSent, dataLen - totalSent, 0); // calling the send system call
+        if (sent < 0) {
+            std::cout << "error sending data to server" << std::endl;
+            return false;
+        }
+        totalSent += sent;
+    }
+    return true; //if all the data is sent through successfully
 }

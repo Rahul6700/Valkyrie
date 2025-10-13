@@ -1,5 +1,6 @@
 #include "ValkeyClient.hpp"
 #include "Connection.hpp"
+#include "RespProtocol.hpp"
 
 // 'connection' is the Connection class obj to be used for all the ValkeyClient methods
 
@@ -23,7 +24,16 @@ bool ValkeyClient::set(const std::string& key, const std::string& value)
     return false;
   }
 
+  if(key.empty() || value.empty())
+  {
+    std::cout << "Key or value cannot be NULL or an empty string" << std::endl;
+    return false;
+  }
 
+  string resp_encoded = RespProtocol::encode({"SET",key,value});
+  if(!connection.sendData(resp_encoded)) return false;
+
+  return true;
 }
 
 

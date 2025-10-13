@@ -4,7 +4,11 @@
 class ValkeyClient {
 public:
   //constructor and destructor
-  ValkeyClient();
+  // as soon as the ValkeyClient constructor is called a Connection obj is also initialized as part of the ValkeyClient class
+  // when we call a ValkeyClient constructor we also need to pass the host ip and the port number
+  // the host and port we pass with the constructor will bind to the Connection obj (the obj is called 'connection')
+  // so now when we can use the Connection::connect method on this obj and when we do the host and port we defined will be used
+  ValkeyClient(const std::string& host, int port) : connection(host,port);
   ~ValkeyClient();
 
   //connection methods
@@ -17,5 +21,5 @@ public:
   bool del(const std::string key);
 
 private:
-  Connection connection; // a pvt connection ocj to be used for all valkey api activities
+  Connection connection; // a pvt connection obj to be used for all ValkeyClient activities
 }; 
