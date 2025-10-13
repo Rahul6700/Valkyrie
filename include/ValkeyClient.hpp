@@ -19,7 +19,7 @@ public:
   //set, get and del functions for interacting with the db
   std::string get(const std::string key);
   std::string set(const std::string& key, const std::string& value);
-  std::string del(const std::string key);
+  std::string del(const std::string& key);
 
 private:
   Connection connection; // a pvt connection obj to be used for all ValkeyClient activities

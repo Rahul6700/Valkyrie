@@ -21,5 +21,6 @@ int main()
   // return 0;
   ValkeyClient client("127.0.0.1",6379);
   client.connect();
-  client.set("yo","hehe");
+  //std::cout << client.set("yo","hehe") << std::endl;
+  std::cout << client.del("yo") << std::endl;
 }
