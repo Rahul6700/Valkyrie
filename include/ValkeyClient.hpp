@@ -24,7 +24,7 @@ public:
   std::string del(const std::string& key);
   std::string mset(const std::vector<std::pair<std::string,std::string>>& vec); //takes in a vector of string pairs, return a string (OK)
   std::vector<std::string> mget(const std::vector<std::string>& vec); // takes in a vector of strings, returns a vector of strings
-
+  std::string expire(const std::string& key, int time);
 private:
   Connection connection; // a pvt connection obj to be used for all ValkeyClient activities
 }; 

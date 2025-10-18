@@ -100,3 +100,17 @@ std::vector<std::string> ValkeyClient::mget(const std::vector<std::string>& vec)
 
   return decoded_arr;
 }
+
+std::string ValkeyClient::expire(const std::string& key, int time)
+{
+  if(!connection.isConnected()) return "Error: connection to server not active";
+  if(key == "") return "Error: Key value cannot be an empty string";
+
+  std::string resp_encoded = RespProtocol::encode({"EXPIRE", key, std::to_string(time)});
+  if(!connection.sendData(resp_encoded)) return "Error: Connection to server is not active";
+
+  std::string reply = connection.receive();
+  std::string decoded_reply = RespProtocol::decode(reply);
+
+  return decoded_reply;
+}
