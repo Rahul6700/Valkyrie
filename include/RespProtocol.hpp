@@ -8,5 +8,6 @@ namespace RespProtocol {
     //decode will take the valkey server response and convert it to a simple reply
     std::string encode(const std::vector<std::string>& arr);
     std::string decode(const std::string& reply);
+    std::vector<std::string> decodeArray(const std::string& reply);
 };
 

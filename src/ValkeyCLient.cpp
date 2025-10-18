@@ -83,3 +83,20 @@ std::string ValkeyClient::mset(const std::vector<std::pair<std::string,std::stri
   if(decoded_reply == "") return "(nil)";
   return decoded_reply;
 }
+
+std::vector<std::string> ValkeyClient::mget(const std::vector<std::string>& vec)
+{
+  if(!connection.isConnected()) return {"Error: connection to server not active"};
+  if(vec.empty()) return {"Error: Key value cannot be an empty string"};
+
+  std::vector<std::string> new_vec = vec;
+  new_vec.insert(new_vec.begin(), std::string("MGET")); // insert 'MGET' to the front of the array
+  
+  std::string resp_encoded = RespProtocol::encode(new_vec);
+  if(!connection.sendData(resp_encoded)) return {"Error: Connection to server is not active"};
+  
+  std::string reply = connection.receive();
+  std::vector<std::string> decoded_arr = RespProtocol::decodeArray(reply);
+
+  return decoded_arr;
+}

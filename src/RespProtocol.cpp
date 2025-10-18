@@ -90,4 +90,42 @@ std::string decode(const std::string& reply) {
     return ""; // in case of some unknowb type
 }
 
+// func to return an array instead of just string (to be used for mget)
+std::vector<std::string> decodeArray(const std::string& reply)
+{
+    std::vector<std::string> elements;
+    if (reply.empty() || reply[0] != '*') return elements;
+
+    size_t pos = 1;
+    while (pos < reply.size())
+    {
+        size_t crlf = reply.find("\r\n", pos);
+        if (crlf == std::string::npos) break;
+
+        std::string line = reply.substr(pos, crlf - pos);
+        if (!line.empty() && line[0] == '$')
+        {
+            int len = std::stoi(line.substr(1));
+            if (len > 0)
+            {
+                std::string data = reply.substr(crlf + 2, len);
+                elements.push_back(data);
+                pos = crlf + 2 + len + 2; // move past $len\r\n<data>\r\n
+            }
+            else
+            {
+                elements.push_back(""); // empty bulk string
+                pos = crlf + 2;
+            }
+        }
+        else
+        {
+            pos = crlf + 2;
+        }
+    }
+
+    return elements;
+}
+
+
 }; // closing the namespace
