@@ -1,4 +1,6 @@
 #include <string>
+#include <vector>
+#include <utility> // for std::pair
 #include "Connection.hpp"
 #pragma once
 
@@ -20,6 +22,8 @@ public:
   std::string get(const std::string& key);
   std::string set(const std::string& key, const std::string& value);
   std::string del(const std::string& key);
+  std::string mset(const std::vector<std::pair<std::string,std::string>>& vec); //takes in a vector of string pairs, return a string (OK)
+  std::vector<std::string> mget(const std::vector<std::string>& vec); // takes in a vector of strings, returns a vector of strings
 
 private:
   Connection connection; // a pvt connection obj to be used for all ValkeyClient activities

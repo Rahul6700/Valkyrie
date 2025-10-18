@@ -62,4 +62,24 @@ std::string ValkeyClient::get(const std::string& key)
   return decoded_reply;
 }
 
+std::string ValkeyClient::mset(const std::vector<std::pair<std::string,std::string>>& vec)
+{
+  if(!connection.isConnected()) return "Error: connection to server not active";
+  if(vec.empty()) return "Error: Key value cannot be an empty string";
 
+  std::vector<std::string> arr; // since the encode function expects a vector of strings (no pairs)
+  arr.push_back("MSET");
+  for(auto i : vec)
+  {
+    arr.push_back(i.first);
+    arr.push_back(i.second);
+  }
+  std::string resp_encoded = RespProtocol::encode(arr);
+  if(!connection.sendData(resp_encoded)) return "Error: Connection to server is not active";
+
+  std::string reply = connection.receive();
+  std::string decoded_reply = RespProtocol::decode(reply);
+  
+  if(decoded_reply == "") return "(nil)";
+  return decoded_reply;
+}

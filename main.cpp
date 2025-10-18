@@ -21,9 +21,12 @@ int main()
   // return 0;
   ValkeyClient client("127.0.0.1",6379);
   client.connect();
-  std::cout << client.set("yo","hehe") << std::endl;
-  //std::cout << client.del("yo") << std::endl;
-  std::cout << client.get("yo") << std::endl;
-  std::cout << client.del("yo") << std::endl;
-  std::cout << client.get("yo") << std::endl;
+  // std::cout << client.set("yo","hehe") << std::endl;
+  // //std::cout << client.del("yo") << std::endl;
+  // std::cout << client.get("yo") << std::endl;
+  // std::cout << client.del("yo") << std::endl;
+  // std::cout << client.get("yo") << std::endl;
+  //std::cout << client.mset({{"hi","there"},{"rahul","senthil"},{"timmy","mummy"}}) << std::endl;
+  std::cout << client.get("timmy") << std::endl;
+  client.close();
 }
