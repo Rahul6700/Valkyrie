@@ -14,9 +14,14 @@ class Connection {
     bool sendData(const std::string& data); //to send data through tcp
     std::string receive(); //to recieve data through tcp
     void close(); //close the tcp connection
+    
+    //this function creates a tcp connection to the same port and host
+    //this conenction is used for the pub/sub system
+    bool connectSubscriber();
                   
   private:
     int sockfd; //socket file descriptor
+    int subsockfd //socket fd for the 2nd tcp connection
     std::string host; //the valkey server ip
     int port; // the valkey server port
     bool connected = false; // initialised to false

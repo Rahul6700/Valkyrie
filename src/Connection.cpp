@@ -17,6 +17,40 @@ Connection::Connection(const std::string& h, int p)
   sockfd = -1;
 }
 
+bool Connection::connectSubscriber()
+{
+  subsockfd = socket(AF_INET, SOCK_STREAM, 0);
+  if(subsockfd < 0)
+  {
+    std::cout << "error creating socker in Connection.connectSubscriber";
+    return false;
+  }
+
+  struct sockaddr_in serverAddress;
+    serverAddress.sin_family = AF_INET; // TCP protocol
+    serverAddress.sin_port = htons(port); // port number
+
+  //we currently have out host as a string, like "127.0.01". we need to convert it to binary cuz the system call accepts a binary input
+  // we use the inet_pton function to convert IPV4/6 addresses from string to binary -> return 1 on success, 0 if not a valid IP addr str, and -ve if some other error
+  if (inet_pton(AF_INET, host.c_str(), &serverAddress.sin_addr) <= 0) {
+    std::cout << "invalid address" << std::endl;
+    ::close(subsockfd);
+    return false;
+  }
+
+  // now we connect to the server using the 'connect' system call (not the connect function we made)
+  // to tell the compiler to use the global system call and not our conenct function, we say ::connect()
+  // we give parameters as the socket fd, a ptr poiting to our host and port dets structure and the size of the struct obj
+  if (::connect(subsockfd, (struct sockaddr*)&serverAddress, sizeof(serverAddress)) < 0) {
+    std::cerr << "Connection failed" << std::endl;
+    ::close(subsockfd);
+    return false;
+  }
+
+  //std::cout << "connection successful to server" << std::endl;
+  return true;
+}
+
 bool Connection::connect()
 {
   //creating socket
