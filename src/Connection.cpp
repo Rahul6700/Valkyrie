@@ -17,6 +17,15 @@ Connection::Connection(const std::string& h, int p)
   sockfd = -1;
 }
 
+// this function takes the TCP output from the pub/sub channel and extracts the key from it and returns it
+std::string Connection::parseMessage(const std::string& msg) {
+    //for the message format -> "message cache_updates <key>"
+    size_t pos = msg.rfind(' ');
+    if (pos != std::string::npos)
+        return msg.substr(pos + 1);
+    return "";
+}
+
 bool Connection::connectSubscriber()
 {
   subsockfd = socket(AF_INET, SOCK_STREAM, 0);
@@ -47,7 +56,25 @@ bool Connection::connectSubscriber()
     return false;
   }
 
-  //std::cout << "connection successful to server" << std::endl;
+// this part creates a new thread called 'subscriberThread' which is then detached
+// the thread runs seperately on the background
+// a while loop is running, cuz of which the thread is always listening for info from the server
+// since the recv() system call which we use to recieve data from the server is blocking, e.i, if the recv() is running, the entire program is paused till it finishes running
+// we dont want that, so we create a seperate thread and let it run in parallal
+ConnectionsubscriberThread = std::thread([this]()
+{
+  char buffer[1024];
+      while (true)
+      {
+        int bytes = recv(subsockfd, buffer, sizeof(buffer)-1, 0);
+        if (bytes <= 0) break;
+        buffer[bytes] = '\0';
+        std::string key = Connection::parseMessage(std::string(buffer));
+        cache.invalidate(key); // to implement the invalidate function which invalidates the cache for this key
+      }
+    });
+    subscriberThread.detach(); // we detach the thread so it runs separately on its own
+
   return true;
 }
 

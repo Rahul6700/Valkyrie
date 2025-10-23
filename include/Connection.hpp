@@ -18,6 +18,8 @@ class Connection {
     //this function creates a tcp connection to the same port and host
     //this conenction is used for the pub/sub system
     bool connectSubscriber();
+    std::thread subscriberThread(); // this is the thread that runs in the background, always listening on the sub/pub channel for invalidation updates
+    // the pub/sub system sends messages in this format -> "message cache_updates <key>"
                   
   private:
     int sockfd; //socket file descriptor
@@ -25,4 +27,5 @@ class Connection {
     std::string host; //the valkey server ip
     int port; // the valkey server port
     bool connected = false; // initialised to false
+    std::string parseMessage(const std::string& msg);
 };
