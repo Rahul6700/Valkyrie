@@ -1,6 +1,7 @@
 #pragma once //ensures the header is included only once per compilation
 #include <string>
 #include <netinet/in.h>
+#include <thread>
 
 class Connection {
   public:
@@ -18,12 +19,12 @@ class Connection {
     //this function creates a tcp connection to the same port and host
     //this conenction is used for the pub/sub system
     bool connectSubscriber();
-    std::thread subscriberThread(); // this is the thread that runs in the background, always listening on the sub/pub channel for invalidation updates
+    std::thread subscriberThread; // this is the thread that runs in the background, always listening on the sub/pub channel for invalidation updates
     // the pub/sub system sends messages in this format -> "message cache_updates <key>"
                   
   private:
     int sockfd; //socket file descriptor
-    int subsockfd //socket fd for the 2nd tcp connection
+    int subsockfd; //socket fd for the 2nd tcp connection
     std::string host; //the valkey server ip
     int port; // the valkey server port
     bool connected = false; // initialised to false

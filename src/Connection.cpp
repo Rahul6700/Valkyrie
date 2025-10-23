@@ -42,7 +42,7 @@ bool Connection::connectSubscriber()
   //we currently have out host as a string, like "127.0.01". we need to convert it to binary cuz the system call accepts a binary input
   // we use the inet_pton function to convert IPV4/6 addresses from string to binary -> return 1 on success, 0 if not a valid IP addr str, and -ve if some other error
   if (inet_pton(AF_INET, host.c_str(), &serverAddress.sin_addr) <= 0) {
-    std::cout << "invalid address" << std::endl;
+    std::cout << "invalid address at pub/sub" << std::endl;
     ::close(subsockfd);
     return false;
   }
@@ -51,7 +51,7 @@ bool Connection::connectSubscriber()
   // to tell the compiler to use the global system call and not our conenct function, we say ::connect()
   // we give parameters as the socket fd, a ptr poiting to our host and port dets structure and the size of the struct obj
   if (::connect(subsockfd, (struct sockaddr*)&serverAddress, sizeof(serverAddress)) < 0) {
-    std::cerr << "Connection failed" << std::endl;
+    std::cerr << "Connection failed at pub/sub" << std::endl;
     ::close(subsockfd);
     return false;
   }
@@ -61,7 +61,7 @@ bool Connection::connectSubscriber()
 // a while loop is running, cuz of which the thread is always listening for info from the server
 // since the recv() system call which we use to recieve data from the server is blocking, e.i, if the recv() is running, the entire program is paused till it finishes running
 // we dont want that, so we create a seperate thread and let it run in parallal
-ConnectionsubscriberThread = std::thread([this]()
+subscriberThread = std::thread([this]()
 {
   char buffer[1024];
       while (true)
@@ -70,11 +70,12 @@ ConnectionsubscriberThread = std::thread([this]()
         if (bytes <= 0) break;
         buffer[bytes] = '\0';
         std::string key = Connection::parseMessage(std::string(buffer));
-        cache.invalidate(key); // to implement the invalidate function which invalidates the cache for this key
+        //cache.invalidate(key); // to implement the invalidate function which invalidates the cache for this key
       }
+      std::cout << "successfully created thread also" << std::endl;
     });
-    subscriberThread.detach(); // we detach the thread so it runs separately on its own
-
+    //subscriberThread.detach(); // not detaching the thread anymore
+  std::cout << "successfully set up pub/sub tcp connection" << std::endl;
   return true;
 }
 
@@ -111,6 +112,8 @@ bool Connection::connect()
     return false;
   }
 
+  if(!Connection::connectSubscriber()) return false;
+
   //std::cout << "connection successful to server" << std::endl;
   connected = true;
   return true;
@@ -120,12 +123,25 @@ bool Connection::connect()
 void Connection::close()
 {
   //check if socket is open first
-  if(sockfd >= 0)
+  if(subsockfd >= 0)
   {
-    ::close(sockfd); //this is global system call, not our func
-    sockfd = -1;
+    shutdown(subsockfd, SHUT_RDWR); // immediately stops the blocking recv()
+    ::close(subsockfd); //this is global system call, not our func
+    subsockfd = -1;
     connected = false;
     //std::cout << "connection closed" << std::endl;
+  }
+  if(subscriberThread.joinable())
+  {
+    subscriberThread.join(); // put the thread to sleep after its ready
+    std::cout << "successfully killed thread" << std::endl;
+  }
+  if(sockfd >= 0)
+  {
+    shutdown(sockfd, SHUT_RDWR);
+    ::close(sockfd);
+    sockfd = -1;
+    std::cout << "closed pub/sub connection" << std::endl;
   }
 }
 
