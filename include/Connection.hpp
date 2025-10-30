@@ -21,10 +21,11 @@ class Connection {
     bool connectSubscriber();
     std::thread subscriberThread; // this is the thread that runs in the background, always listening on the sub/pub channel for invalidation updates
     // the pub/sub system sends messages in this format -> "message cache_updates <key>"
-                  
+    int subsockfd; //socket fd for the 2nd tcp connection
+    bool threadReady;
+
   private:
     int sockfd; //socket file descriptor
-    int subsockfd; //socket fd for the 2nd tcp connection
     std::string host; //the valkey server ip
     int port; // the valkey server port
     bool connected = false; // initialised to false

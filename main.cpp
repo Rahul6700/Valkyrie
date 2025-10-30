@@ -23,15 +23,6 @@ int main()
   client.connect();
   // std::cout << client.set("yo","hehe") << std::endl;
   // //std::cout << client.del("yo") << std::endl;
-  // std::cout << client.get("yo") << 2️⃣ Issue with RespProtocol::encode({"EXPIRE", key, time})2️⃣ Issue with RespProtocol::encode({"EXPIRE", key, time})
-
-  // std::cout << client.mset({{"hi","there"},{"rahul","senthil"},{"timmy","mummy"}}) << std::endl;
-  // vector<string> arr = Client.mget({"hi","rahul","timmy","yo"});
-  // for(auto i : arr)
-  // {
-  //   std::cout << i << std::endl;
-  // }
-  // std::cout << client.del("yo") << std::endl;
   // std::cout << client.get("yo") << std::endl;
   // std::cout << client.mset({{"hi","there"},{"rahul","senthil"},{"timmy","mummy"}}) << std::endl;
   // std::vector<std::string> arr;
@@ -40,5 +31,7 @@ int main()
   // {
   //   std::cout << i << std::endl;
   // }
+  std::cout << client.set("rahul","hi") << std::endl;
+  std::cout << client.get("rahul") << std::endl;
   client.close();
 }

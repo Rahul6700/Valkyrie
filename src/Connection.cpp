@@ -4,6 +4,7 @@
 #include <arpa/inet.h>
 #include <iostream>
 #include <string>
+#include <future>
 
 // not importing 'namespace std' since we'll have a naming conflict, we have a user defined 'close' func and a 'close' system call
 
@@ -61,8 +62,26 @@ bool Connection::connectSubscriber()
 // a while loop is running, cuz of which the thread is always listening for info from the server
 // since the recv() system call which we use to recieve data from the server is blocking, e.i, if the recv() is running, the entire program is paused till it finishes running
 // we dont want that, so we create a seperate thread and let it run in parallal
-subscriberThread = std::thread([this]()
+
+
+// we'll use a future and promise to solve the subscriberThread - main thread wait issue
+// the promise object is attached to the subscriber thread and the future to the main thread
+// the promise has a .set_value() function that will set a condiitonal val once its created
+// the future object has a .get() methood that keeps waiting for the promise to set a value
+// so once the thread is created the promise sets a true and till then the main waits
+// once the val is set to true, the .get() recieves the val and the main thread continues
+
+  std::promise<void> promiseObj;
+  std::future<void> futureObj = promiseObj.get_future();
+subscriberThread = std::thread([this, promise = std::move(promiseObj)]() mutable
 {
+
+  std::cout << "subscriber thread creating..." << std::endl;
+
+  promise.set_value(); // basically signalling im ready
+                      
+  std::cout << "successfully created subscriberThread" << std::endl;
+
   char buffer[1024];
       while (true)
       {
@@ -72,10 +91,10 @@ subscriberThread = std::thread([this]()
         std::string key = Connection::parseMessage(std::string(buffer));
         //cache.invalidate(key); // to implement the invalidate function which invalidates the cache for this key
       }
-      std::cout << "successfully created thread also" << std::endl;
     });
-    //subscriberThread.detach(); // not detaching the thread anymore
+      futureObj.get(); // listening for the promise's value 
   std::cout << "successfully set up pub/sub tcp connection" << std::endl;
+ // subscriberThread.join(); // this should wait for the thread to finish being created before the function retuning
   return true;
 }
 

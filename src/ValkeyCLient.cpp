@@ -1,6 +1,7 @@
 #include "ValkeyClient.hpp"
 #include "Connection.hpp"
 #include "RespProtocol.hpp"
+#include <iostream>
 
 // 'connection' is the Connection class obj to be used for all the ValkeyClient methods
 
@@ -29,6 +30,11 @@ std::string ValkeyClient::set(const std::string& key, const std::string& value)
   std::string decoded_reply = RespProtocol::decode(reply);
   
   if(decoded_reply != "OK") return "Error: " + decoded_reply; // adding the 'Error' tag to any non-OK respone
+  else {
+    std::string pubMessage = "PUBLISH cache_invalidation " + key + "\n"; 
+    ::send(connection.subsockfd, pubMessage.c_str(), pubMessage.size(), 0);
+    std::cout << "sent publish to server" << std::endl;
+  }
   
   return decoded_reply;
 }
