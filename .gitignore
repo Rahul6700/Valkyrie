@@ -42,3 +42,33 @@ a
 
 # debug information files
 *.dwo
+
+# Build directories
+build/
+build-*/
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+
+# Compiled binaries
+*.o
+*.out
+*.exe
+valkyrie
+
+# Debug / profiling
+*.dSYM/
+*.prof
+*.gcda
+*.gcno
+
+# Editor / OS junk
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
