@@ -1,6 +1,7 @@
 #include <string>
 #include <unordered_map>
 #include <tuple>
+#include <mutex>
 
 // TODO:
 // make the cache system
@@ -15,39 +16,28 @@
 
 class Cache {
   public:
-    // hi
-    
+    // this enum will be used with the connect constructor to decide whether we wanna use the cache or not
+    enum cacheReq
+    {
+        ENABLED,
+        DISABLED
+    };
+
   private:
     // this <str,str> map is what will act as the actual cache
     std::unordered_map<std::string,std::string> cacheMap;
+    std::mutex_lock cacheLock;
 
     // this is our lookup function
     // takes in the key str by ref
     // returns a tuple <bool,string>
     // if the kv pair is found in cache it return <true,value>
     // if not found it returns <false,"">
-    std::tuple<bool found, std::string> lookup (const std::string& key)
-    {
-        auto it = cacheMap.find(key);
-        if(it != cacheMap.end()) // if found
-        {
-            return {true, it->second};
-        }
-        else return {false, ""};
-    }
-    
-    // removes the kv pair taking in a key
-    void remove (const std::string& key)
-    {
-        cacheMap.remove(key);
-    }
+    std::tuple<bool found, std::string> lookup (const std::string& key);
 
-    std::bool insert (const std::string& key, const std::string& value)
-    {
-        // logic to check if there exists space to insert a new kv pair
-        
-        cacheMap[key] = value;
-        return true;
-    }
+    // removes the kv pair taking in a key
+    void remove (const std::string& key);
+
+    std::bool insert (const std::string& key, const std::string& value);
 
 }
