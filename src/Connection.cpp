@@ -131,7 +131,7 @@ bool Connection::connect()
     return false;
   }
 
-  if(!Connection::connectSubscriber()) return false;
+  //if(!Connection::connectSubscriber()) return false;
 
   //std::cout << "connection successful to server" << std::endl;
   connected = true;
@@ -153,7 +153,7 @@ void Connection::close()
   if(subscriberThread.joinable())
   {
     subscriberThread.join(); // put the thread to sleep after its ready
-    std::cout << "successfully killed thread" << std::endl;
+    std::cout << "successfully joined sub thread" << std::endl;
   }
   if(sockfd >= 0)
   {

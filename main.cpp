@@ -24,14 +24,16 @@ int main()
   // std::cout << client.set("yo","hehe") << std::endl;
   // //std::cout << client.del("yo") << std::endl;
   // std::cout << client.get("yo") << std::endl;
-  // std::cout << client.mset({{"hi","there"},{"rahul","senthil"},{"timmy","mummy"}}) << std::endl;
-  // std::vector<std::string> arr;
-  // arr = client.mget({"hi","rahul","timmy","yo"});
-  // for(auto i : arr)
-  // {
-  //   std::cout << i << std::endl;
-  // }
-  std::cout << client.set("rahul","hi") << std::endl;
-  std::cout << client.get("rahul") << std::endl;
+  std::cout << client.mset({{"hi","there"},{"rahul","senthil"},{"timmy","mummy"}}) << std::endl;
+  std::vector<std::string> arr;
+  arr = client.mget({"hi","rahul","timmy","yo"});
+  for(const auto i : arr)
+  {
+    std::cout << i << std::endl;
+  }
+  //std::cout << client.set("rahul","hi") << std::endl;
+  //std::cout << client.get("rahul") << std::endl;
   client.close();
 }
+
+
