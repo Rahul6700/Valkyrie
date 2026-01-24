@@ -26,18 +26,18 @@ class Cache {
   private:
     // this <str,str> map is what will act as the actual cache
     std::unordered_map<std::string,std::string> cacheMap;
-    std::mutex_lock cacheLock;
+    std::mutex cacheLock;
 
     // this is our lookup function
     // takes in the key str by ref
     // returns a tuple <bool,string>
     // if the kv pair is found in cache it return <true,value>
     // if not found it returns <false,"">
-    std::tuple<bool found, std::string> lookup (const std::string& key);
+    std::tuple<bool, std::string> lookup (const std::string& key);
 
     // removes the kv pair taking in a key
-    void remove (const std::string& key);
+    void erase (const std::string& key);
 
-    std::bool insert (const std::string& key, const std::string& value);
+    bool insert (const std::string& key, const std::string& value);
 
-}
+};

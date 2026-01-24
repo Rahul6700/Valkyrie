@@ -14,6 +14,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # creating a exe called valkyrie from the following .cpp files
 add_executable(valkyrie
     main.cpp
+    src/Cache.cpp
     src/Connection.cpp
     src/RespProtocol.cpp
     src/ValkeyClient.cpp

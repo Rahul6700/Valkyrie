@@ -6,36 +6,38 @@
 
 
 // use cacheMap and cacheLock
-class cache {
-  public:
 
-  private:
     // this is our lookup function
     // takes in the key str by ref
     // returns a tuple <bool,string>
     // if the kv pair is found in cache it return <true,value>
     // if not found it returns <false,"">
-    std::tuple<bool found, std::string> lookup (const std::string& key)
+    std::tuple<bool, std::string> Cache::lookup (const std::string& key)
     {
         cacheLock.lock();
         auto it = cacheMap.find(key);
         if(it != cacheMap.end()) // if found
         {
+            cacheLock.unlock();
             return {true, it->second};
         }
-        else return {false, ""};
-        cacheLock.unlock();
+
+        else
+        {
+            cacheLock.unlock();
+            return {false, ""};
+        }
     }
     
     // removes the kv pair taking in a key
-    void remove (const std::string& key)
+    void Cache::erase (const std::string& key)
     {
         cacheLock.lock();
-        cacheMap.remove(key);
+        cacheMap.erase(key);
         cacheLock.unlock();
     }
 
-    std::bool insert (const std::string& key, const std::string& value)
+    bool Cache::insert (const std::string& key, const std::string& value)
     {
         cacheLock.lock();
         // logic to check if there exists space to insert a new kv pair
@@ -44,4 +46,3 @@ class cache {
         cacheLock.unlock();
         return true;
     }
-}
