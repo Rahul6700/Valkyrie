@@ -2,6 +2,7 @@
 #include <vector>
 #include <utility> // for std::pair
 #include "Connection.hpp"
+#include "Cache.hpp"
 #pragma once
 
 class ValkeyClient {
@@ -11,7 +12,7 @@ public:
   // when we call a ValkeyClient constructor we also need to pass the host ip and the port number
   // the host and port we pass with the constructor will bind to the Connection obj (the obj is called 'connection')
   // so now when we can use the Connection::connect method on this obj and when we do the host and port we defined will be used
-  ValkeyClient(const std::string& host, int port) : connection(host,port){};
+  ValkeyClient(const std::string& host, int port, Cache::cacheReq cache) : connection(host,port,cache){};
   //~ValkeyClient(); use default one
 
   //connection methods

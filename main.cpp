@@ -19,7 +19,7 @@ int main()
   // else std::cout << "error connection from main" << std::endl;
   // obj.close();
   // return 0;
-  ValkeyClient client("127.0.0.1",6379);
+  ValkeyClient client("127.0.0.1",6379,Cache::DISABLED);
   client.connect();
   // std::cout << client.set("yo","hehe") << std::endl;
   // //std::cout << client.del("yo") << std::endl;

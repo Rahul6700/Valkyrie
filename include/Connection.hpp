@@ -2,11 +2,12 @@
 #include <string>
 #include <netinet/in.h>
 #include <thread>
+#include "Cache.hpp"
 
 class Connection {
   public:
     //constructor and destructor
-    Connection(const std::string &host, int port);
+    Connection(const std::string &host, int port, Cache::cacheReq cache);
     ~Connection();
 
     //methods
@@ -28,6 +29,7 @@ class Connection {
     int sockfd; //socket file descriptor
     std::string host; //the valkey server ip
     int port; // the valkey server port
+    Cache::cacheReq cache;
     bool connected = false; // initialised to false
     std::string parseMessage(const std::string& msg);
 };

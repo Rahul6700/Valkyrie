@@ -5,16 +5,18 @@
 #include <iostream>
 #include <string>
 #include <future>
+#include "Cache.hpp"
 
 // not importing 'namespace std' since we'll have a naming conflict, we have a user defined 'close' func and a 'close' system call
 
 //defining all the Connection class functions
 
 //the constructor
-Connection::Connection(const std::string& h, int p)
+Connection::Connection(const std::string& h, int p, Cache::cacheReq c)
 {
   this->host = h;
   this->port = p;
+  this->cache = c;
   sockfd = -1;
 }
 
@@ -131,7 +133,10 @@ bool Connection::connect()
     return false;
   }
 
-  //if(!Connection::connectSubscriber()) return false;
+  if(cache == Cache::ENABLED)
+  {
+      if(!Connection::connectSubscriber()) return false;
+  }
 
   //std::cout << "connection successful to server" << std::endl;
   connected = true;
