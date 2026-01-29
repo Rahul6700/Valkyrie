@@ -13,6 +13,7 @@ class Connection {
     //methods
     bool connect(); //to establish a connection with the valkey server
     bool isConnected() const { return connected; } // method to track whether the connection is active
+    bool isSubConnected() const { return subConnected; } // func to check if the sub Conn is active, returns the val of the isSubConnected Var
     bool sendData(const std::string& data); //to send data through tcp
     std::string receive(); //to recieve data through tcp
     void close(); //close the tcp connection
@@ -31,5 +32,6 @@ class Connection {
     int port; // the valkey server port
     Cache::cacheReq cache;
     bool connected = false; // initialised to false
+    bool subConnected = false;
     std::string parseMessage(const std::string& msg);
 };

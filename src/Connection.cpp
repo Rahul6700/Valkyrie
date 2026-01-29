@@ -97,6 +97,7 @@ subscriberThread = std::thread([this, promise = std::move(promiseObj)]() mutable
       futureObj.get(); // listening for the promise's value 
   std::cout << "successfully set up pub/sub tcp connection" << std::endl;
  // subscriberThread.join(); // this should wait for the thread to finish being created before the function retuning
+  subConnected = true;
   return true;
 }
 
