@@ -6,6 +6,7 @@
 #include <string>
 #include <future>
 #include "Cache.hpp"
+#include "Utils.hpp"
 
 // not importing 'namespace std' since we'll have a naming conflict, we have a user defined 'close' func and a 'close' system call
 
@@ -137,6 +138,8 @@ bool Connection::connect()
   if(cache == Cache::ENABLED)
   {
       if(!Connection::connectSubscriber()) return false;
+      clientID = generateID();
+      std::cout << "ID generated - " << clientID << std::endl;
   }
 
   //std::cout << "connection successful to server" << std::endl;

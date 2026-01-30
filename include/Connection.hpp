@@ -25,6 +25,7 @@ class Connection {
     // the pub/sub system sends messages in this format -> "message cache_updates <key>"
     int subsockfd; //socket fd for the 2nd tcp connection
     //bool threadReady; // not sure where this is used, mostly redundent, commenting out instead of del just to be safe
+    std::string clientID; // the unique ID generated for every client
 
   private:
     int sockfd; //socket file descriptor
