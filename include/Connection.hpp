@@ -24,7 +24,7 @@ class Connection {
     std::thread subscriberThread; // this is the thread that runs in the background, always listening on the sub/pub channel for invalidation updates
     // the pub/sub system sends messages in this format -> "message cache_updates <key>"
     int subsockfd; //socket fd for the 2nd tcp connection
-    bool threadReady;
+    //bool threadReady; // not sure where this is used, mostly redundent, commenting out instead of del just to be safe
 
   private:
     int sockfd; //socket file descriptor

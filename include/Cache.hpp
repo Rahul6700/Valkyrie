@@ -14,6 +14,10 @@
 // 5. a mutex lock for thread safety
 // 6. optionally TTL and LRU eviction
 
+// look out for:
+// 1. Self Invalidation -> client updates its cache and sends publish to invalidate, the server forwards the publish back to it and it only invalidates
+// fix the above using a client ID maybe
+// 2. thread safety
 
 class Cache {
   public:
