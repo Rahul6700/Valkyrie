@@ -18,6 +18,7 @@ add_executable(valkyrie
     src/Connection.cpp
     src/RespProtocol.cpp
     src/ValkeyClient.cpp
+    src/Utils.cpp
 )
 
 # when building the exe valkyrie, add /include to the header search path

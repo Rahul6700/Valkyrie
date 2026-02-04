@@ -1,5 +1,8 @@
 #pragma once
 #include <string>
 
-std::string generateID();
+namespace Utils
+{
+    std::string generateID();
+}
 
