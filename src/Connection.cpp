@@ -138,7 +138,7 @@ bool Connection::connect()
   if(cache == Cache::ENABLED)
   {
       if(!Connection::connectSubscriber()) return false;
-      clientID = generateID();
+      clientID = Utils::generateID();
       std::cout << "ID generated - " << clientID << std::endl;
   }
 

@@ -30,6 +30,8 @@ class Cache {
         DISABLED
     };
 
+    std::tuple<bool, std::string> checkCache (const std::string& key);
+
   private:
     // this <str,str> map is what will act as the actual cache
     std::unordered_map<std::string,std::string> cacheMap;
