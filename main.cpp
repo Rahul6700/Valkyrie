@@ -4,6 +4,7 @@
 #include "Connection.hpp"
 #include "RespProtocol.hpp"
 #include "ValkeyClient.hpp"
+#include "Cache.hpp"
 
 int main()
 {
@@ -24,15 +25,19 @@ int main()
   // std::cout << client.set("yo","hehe") << std::endl;
   // //std::cout << client.del("yo") << std::endl;
   // std::cout << client.get("yo") << std::endl;
-  std::cout << client.mset({{"hi","there"},{"rahul","senthil"},{"timmy","mummy"}}) << std::endl;
-  std::vector<std::string> arr;
-  arr = client.mget({"hi","rahul","timmy","yo"});
-  for(const auto i : arr)
-  {
-    std::cout << i << std::endl;
-  }
+  // std::cout << client.mset({{"hi","there"},{"rahul","senthil"},{"timmy","mummy"}}) << std::endl;
+  // std::vector<std::string> arr;
+  // arr = client.mget({"hi","rahul","timmy","yo"});
+  // for(const auto i : arr)
+  // {
+  //   std::cout << i << std::endl;
+  // }
   //std::cout << client.set("rahul","hi") << std::endl;
   //std::cout << client.get("rahul") << std::endl;
+  //if(Cache::insert("water", "bottle")) std::cout << "cache inserted" << std::endl;
+  //auto [a,b] = Cache::checkCache("water");
+  //if(!a) std::cout << "no cache found" << std::endl;
+  //else std::cout << "cache found and val is " << b << std::endl;
   client.close();
 }
 

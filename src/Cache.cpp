@@ -14,36 +14,29 @@
     // if not found it returns <false,"">
     std::tuple<bool, std::string> Cache::lookup (const std::string& key)
     {
-        cacheLock.lock();
+        std::lock_guard<std::mutex> lock(cacheLock);
+
         auto it = cacheMap.find(key);
         if(it != cacheMap.end()) // if found
         {
-            cacheLock.unlock();
             return {true, it->second};
         }
-
-        else
-        {
-            cacheLock.unlock();
-            return {false, ""};
-        }
+        return {false, ""};
     }
     
     // removes the kv pair taking in a key
     void Cache::erase (const std::string& key)
     {
-        cacheLock.lock();
+        std::lock_guard<std::mutex> lock(cacheLock);
         cacheMap.erase(key);
-        cacheLock.unlock();
     }
 
     bool Cache::insert (const std::string& key, const std::string& value)
     {
-        cacheLock.lock();
+        std::lock_guard<std::mutex> lock(cacheLock);
+
         // logic to check if there exists space to insert a new kv pair
-        
         cacheMap[key] = value;
-        cacheLock.unlock();
         return true;
     }
 
@@ -57,7 +50,7 @@
     {
         auto [found, val] = lookup(key);
         
-        if(found == false) return {false, ""};
+        if(!found) return {false, ""};
 
         return {true,val};
     }
