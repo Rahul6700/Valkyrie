@@ -21,17 +21,20 @@ class Connection {
     //this function creates a tcp connection to the same port and host
     //this conenction is used for the pub/sub system
     bool connectSubscriber();
-    std::thread subscriberThread; // this is the thread that runs in the background, always listening on the sub/pub channel for invalidation updates
+    Cache cache; // client-side fixed-size LRU cache
+    std::thread subscriberThread; // background thread listening on pub/sub for invalidation
     // the pub/sub system sends messages in this format -> "message cache_updates <key>"
-    int subsockfd; //socket fd for the 2nd tcp connection
-    //bool threadReady; // not sure where this is used, mostly redundent, commenting out instead of del just to be safe
-    std::string clientID; // the unique ID generated for every client
+    int subsockfd; // socket fd for the 2nd tcp connection
+    std::string clientID; // unique ID generated for every client, set in connections.cpp
+
+    Cache& getCache() { return cache; }
+    bool isCacheEnabled() const { return cacheMode == Cache::ENABLED; }
 
   private:
     int sockfd; //socket file descriptor
     std::string host; //the valkey server ip
     int port; // the valkey server port
-    Cache::cacheReq cache;
+    Cache::cacheReq cacheMode;
     bool connected = false; // initialised to false
     bool subConnected = false;
     std::string parseMessage(const std::string& msg);

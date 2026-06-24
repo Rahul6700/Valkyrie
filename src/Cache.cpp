@@ -1,57 +1,80 @@
-#include <string>
-#include <unordered_map>
-#include <tuple>
-#include <mutex>
 #include "Cache.hpp"
+#include <iostream>
 
+// Constructor: just stores the maximum cache size
+Cache::Cache(size_t maxSize)
+    : maxSize(maxSize)
+{
+}
 
-// use cacheMap and cacheLock
+// Lookup a key in the cache.
+// If found, the key is spliced to the front of the LRU list (most recently used)
+// and {true, value} is returned. Otherwise {false, ""}.
+std::tuple<bool, std::string> Cache::get(const std::string& key)
+{
+    std::lock_guard<std::mutex> lock(cacheLock);
 
-    // this is our lookup function
-    // takes in the key str by ref
-    // returns a tuple <bool,string>
-    // if the kv pair is found in cache it return <true,value>
-    // if not found it returns <false,"">
-    std::tuple<bool, std::string> Cache::lookup (const std::string& key)
-    {
-        std::lock_guard<std::mutex> lock(cacheLock);
-
-        auto it = cacheMap.find(key);
-        if(it != cacheMap.end()) // if found
-        {
-            return {true, it->second};
-        }
+    auto it = cacheMap.find(key);
+    if (it == cacheMap.end())
         return {false, ""};
-    }
-    
-    // removes the kv pair taking in a key
-    void Cache::erase (const std::string& key)
+
+    // Promote this key to the front — it is now the most recently used
+    lruList.splice(lruList.begin(), lruList, it->second.second);
+
+    //std::cout << "Fetched from cache" << std::endl;
+
+    return {true, it->second.first};
+}
+
+// Insert or update a key-value pair.
+// If the key already exists, the value is updated and the key is promoted to MRU.
+// If the key is new and the cache is full, the LRU entry (back of list) is evicted
+// before inserting the new entry at the front.
+void Cache::put(const std::string& key, const std::string& value)
+{
+    std::lock_guard<std::mutex> lock(cacheLock);
+
+    auto it = cacheMap.find(key);
+    if (it != cacheMap.end())
     {
-        std::lock_guard<std::mutex> lock(cacheLock);
-        cacheMap.erase(key);
+        // Key exists — update value and move to front (MRU)
+        it->second.first = value;
+        lruList.splice(lruList.begin(), lruList, it->second.second);
+        return;
     }
 
-    bool Cache::insert (const std::string& key, const std::string& value)
+    // New key: make room by evicting the least recently used entry if needed
+    if (cacheMap.size() >= maxSize)
     {
-        std::lock_guard<std::mutex> lock(cacheLock);
-
-        // logic to check if there exists space to insert a new kv pair
-        cacheMap[key] = value;
-        return true;
+        std::string lruKey = lruList.back();
+        lruList.pop_back();
+        cacheMap.erase(lruKey);
     }
 
-// std::string generateID()
-// {
-//     auto time = std::chrono::high_resolution_clock::now().time_since_epoch().count(); // gets the time, typically long long
-//     return std::to_string(getpid()) + "-" + std::to_string(time); // pid + '-' + time
-// }
+    // Insert the new entry at the front (most recently used)
+    lruList.push_front(key);
+    cacheMap[key] = {value, lruList.begin()};
+}
 
-    std::tuple<bool, std::string> Cache::checkCache(const std::string& key)
+// Erase a single entry from the cache.
+void Cache::erase(const std::string& key)
+{
+    std::lock_guard<std::mutex> lock(cacheLock);
+
+    auto it = cacheMap.find(key);
+    if (it != cacheMap.end())
     {
-        auto [found, val] = lookup(key);
-        
-        if(!found) return {false, ""};
-
-        return {true,val};
+        lruList.erase(it->second.second);
+        cacheMap.erase(it);
     }
+}
 
+// Invalidate a key, but only if the invalidation did not originate from this client.
+// This prevents the client from invalidating its own cache after a SET it just performed.
+void Cache::invalidate(const std::string& key, const std::string& senderID)
+{
+    if (!senderID.empty() && senderID == clientID)
+        return;
+
+    erase(key);
+}

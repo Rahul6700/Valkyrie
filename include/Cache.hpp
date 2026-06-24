@@ -1,52 +1,50 @@
 #pragma once
 #include <string>
 #include <unordered_map>
+#include <list>
 #include <tuple>
 #include <mutex>
-#include <unistd.h>
-#include <chrono> // for time
-
-// TODO:
-// make the cache system
-// we need the following:
-// 1. an unordered_map of limited size
-// 2. a function for lookup
-// 3. a function to write to cache
-// 4. a function that invalidates cache
-// 5. a mutex lock for thread safety
-// 6. optionally TTL and LRU eviction
-
-// look out for:
-// 1. Self Invalidation -> client updates its cache and sends publish to invalidate, the server forwards the publish back to it and it only invalidates
-// fix the above using a client ID maybe
-// 2. thread safety
 
 class Cache {
   public:
-    // this enum will be used with the connect constructor to decide whether we wanna use the cache or not
+    // Enum used by Connection to decide whether to enable pub/sub invalidation
     enum cacheReq
     {
         ENABLED,
         DISABLED
     };
 
-    std::tuple<bool, std::string> checkCache (const std::string& key);
+    // Constructor: sets a fixed maximum number of entries for the cache
+    // Default is 100 entries. Once full, the least recently used entry is evicted.
+    Cache(size_t maxSize = 100);
+
+    // Thread-safe LRU-aware lookup.
+    // If the key is found, it is promoted to "most recently used" and {true, value} is returned.
+    // If not found, returns {false, ""}.
+    std::tuple<bool, std::string> get(const std::string& key);
+
+    // Thread-safe insert or update.
+    // If the key exists, its value is updated and it is promoted to MRU.
+    // If it is a new key and the cache is at capacity, the LRU entry is evicted first.
+    void put(const std::string& key, const std::string& value);
+
+    // Thread-safe removal of a single entry by key.
+    void erase(const std::string& key);
+
+    // Invalidation used by the pub/sub listener.
+    // If senderID matches this client's ID, the invalidation is ignored
+    // (avoids self-invalidation from our own SET publishing back to us).
+    void invalidate(const std::string& key, const std::string& senderID = "");
+
+    // Stores this client's unique ID so we can skip self-invalidation.
+    void setClientID(const std::string& id) { clientID = id; }
 
   private:
-    // this <str,str> map is what will act as the actual cache
-    std::unordered_map<std::string,std::string> cacheMap;
-    std::mutex cacheLock;
-
-    // this is our lookup function
-    // takes in the key str by ref
-    // returns a tuple <bool,string>
-    // if the kv pair is found in cache it return <true,value>
-    // if not found it returns <false,"">
-    std::tuple<bool, std::string> lookup (const std::string& key);
-
-    // removes the kv pair taking in a key
-    void erase (const std::string& key);
-
-    bool insert (const std::string& key, const std::string& value);
-
+    size_t maxSize; // limit for cache entries
+    std::list<std::string> lruList; // using a LL with front as MRU and back as LRU
+    // we store key as string and value as a pair of <string,list iterator>
+    // key string is our key val, value string is our value val and the list iterator points to the node of the LL so we can move it as needed
+    std::unordered_map<std::string,std::pair<std::string, std::list<std::string>::iterator>> cacheMap;
+    std::mutex cacheLock; 
+    std::string clientID;  // used to skip self invalidation
 };

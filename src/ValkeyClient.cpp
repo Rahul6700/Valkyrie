@@ -31,9 +31,14 @@ std::string ValkeyClient::set(const std::string& key, const std::string& value)
   
   if(decoded_reply != "OK") return "Error: " + decoded_reply; // adding the 'Error' tag to any non-OK respone
   else {
-    std::string pubMessage = "PUBLISH cache_invalidation " + key + "\n"; 
-    ::send(connection.subsockfd, pubMessage.c_str(), pubMessage.size(), 0);
-    std::cout << "sent publish to server" << std::endl;
+    if(connection.isCacheEnabled()) {
+      // Update the local cache immediately
+      connection.getCache().put(key, value);
+      // Publish invalidation so other clients evict their stale copy
+      std::string pubMessage = "PUBLISH cache_invalidation " + key + "\n"; 
+      ::send(connection.subsockfd, pubMessage.c_str(), pubMessage.size(), 0);
+      std::cout << "sent publish to server" << std::endl;
+    }
   }
   
   return decoded_reply;
@@ -58,13 +63,25 @@ std::string ValkeyClient::get(const std::string& key)
   if(!connection.isConnected()) return "Error: connection to server not active";
   if(key.empty()) return "Error: Key value cannot be an empty string";
 
+  // Check the local LRU cache first
+  if(connection.isCacheEnabled())
+  {
+    auto [found, value] = connection.getCache().get(key);
+    if(found) return value;
+  }
+
   std::string resp_encoded = RespProtocol::encode({"GET",key});
   if(!connection.sendData(resp_encoded)) return "Error: Connection to server is not active";
 
   std::string reply = connection.receive();
   std::string decoded_reply = RespProtocol::decode(reply);
 
-  if(decoded_reply == "") return "(nil)";
+  if(decoded_reply == "" || decoded_reply.substr(0,6) == "Error:") return "(nil)";
+
+  // Cache the result from the server for future lookups
+  if(connection.isCacheEnabled())
+    connection.getCache().put(key, decoded_reply);
+
   return decoded_reply;
 }
 
